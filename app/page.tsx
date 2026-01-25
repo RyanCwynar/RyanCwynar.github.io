@@ -23,12 +23,20 @@ export default function Home() {
         body: JSON.stringify(formData),
       });
       
+      const data = await res.json();
+      
       if (res.ok) {
         setStatus("success");
         setMessage("Got it! I'll create your mockup and send it to your email within 24-48 hours.");
         setFormData({ name: "", email: "", website: "", phone: "" });
+      } else if (data.error === "daily_limit") {
+        setStatus("error");
+        setMessage("We've reached our daily limit of 15 mockups! Try again tomorrow.");
+      } else if (data.error === "domain_exists") {
+        setStatus("error");
+        setMessage("We've already created a mockup for this website. Check your email!");
       } else {
-        throw new Error("Failed to submit");
+        throw new Error(data.message || "Failed to submit");
       }
     } catch (err) {
       setStatus("error");
