@@ -27,14 +27,14 @@ export default function Home() {
       
       if (res.ok) {
         setStatus("success");
-        setMessage("Got it! I'll create your mockup and send it to your email within 24-48 hours.");
+        setMessage("Got it! I'll build your new site and send the link to your email within 24-48 hours.");
         setFormData({ name: "", email: "", website: "", phone: "" });
       } else if (data.error === "daily_limit") {
         setStatus("error");
-        setMessage("We've reached our daily limit of 15 mockups! Try again tomorrow.");
+        setMessage("We've hit our daily limit! Try again tomorrow.");
       } else if (data.error === "domain_exists") {
         setStatus("error");
-        setMessage("We've already created a mockup for this website. Check your email!");
+        setMessage("We've already built a site for this domain. Check your email!");
       } else {
         throw new Error(data.message || "Failed to submit");
       }
@@ -59,7 +59,7 @@ export default function Home() {
             <div className="text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-slate-300 text-sm mb-6">
                 <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                Free mockup, no obligation
+                Free website upgrade, no obligation
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -67,9 +67,8 @@ export default function Home() {
               </h1>
               
               <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-                If you&apos;re here, it&apos;s because I found your business online and think 
-                your website deserves an upgrade. Let me build you a free mockup — 
-                no strings attached.
+                I&apos;ll build you a brand new, modern website — completely free. 
+                It&apos;s ready to go live. Just point your domain and you&apos;re done.
               </p>
 
               <div className="hidden lg:block">
@@ -90,7 +89,7 @@ export default function Home() {
               <div className="absolute -inset-4 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-3xl blur-2xl"></div>
               <div className="relative bg-slate-800/80 backdrop-blur-sm p-8 rounded-2xl border border-slate-700/50">
                 <h2 className="text-2xl font-bold text-white mb-2">Upgrade My Website</h2>
-                <p className="text-slate-400 mb-6">I&apos;ll send you a custom mockup within 48 hours</p>
+                <p className="text-slate-400 mb-6">Get a ready-to-launch site within 48 hours</p>
                 
                 {status === "success" ? (
                   <div className="bg-green-500/20 border border-green-500/50 rounded-xl p-6 text-center">
@@ -164,12 +163,12 @@ export default function Home() {
                           Sending...
                         </span>
                       ) : (
-                        "Get My Free Mockup →"
+                        "Get My Free Website →"
                       )}
                     </button>
                     
                     <p className="text-slate-500 text-xs text-center">
-                      No payment required. I&apos;ll build your mockup first.
+                      No payment required. You only pay if you want to keep it.
                     </p>
                   </form>
                 )}
@@ -206,9 +205,9 @@ export default function Home() {
               <div className="w-16 h-16 bg-purple-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">2️⃣</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">I Build a Mockup</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">I Build Your Site</h3>
               <p className="text-slate-400 text-sm">
-                Custom design using your content and branding
+                A complete, working website using your content
               </p>
             </div>
             
@@ -218,7 +217,7 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Review & Decide</h3>
               <p className="text-slate-400 text-sm">
-                Check your email for the mockup link
+                Check your email — it&apos;s already live and working
               </p>
             </div>
             
@@ -226,16 +225,16 @@ export default function Home() {
               <div className="w-16 h-16 bg-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl">4️⃣</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Go Live for $200</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">Point & Launch</h3>
               <p className="text-slate-400 text-sm">
-                Love it? One payment and it&apos;s yours
+                Love it? $200 and we&apos;ll connect your domain
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* What You Get */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm p-8 md:p-12 rounded-3xl border border-white/10">
@@ -245,14 +244,14 @@ export default function Home() {
                   Just $200
                 </h2>
                 <p className="text-slate-300 mb-6">
-                  One-time payment. No subscriptions. You own everything.
+                  One-time payment. No subscriptions. Includes any changes you want.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-2 text-slate-300">
                     <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Custom modern design
+                    Fully working website (not a mockup)
                   </li>
                   <li className="flex items-center gap-2 text-slate-300">
                     <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,13 +263,19 @@ export default function Home() {
                     <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Fast loading
+                    Fast loading (modern tech)
                   </li>
                   <li className="flex items-center gap-2 text-slate-300">
                     <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Full source code
+                    You own the code
+                  </li>
+                  <li className="flex items-center gap-2 text-slate-300">
+                    <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Changes included
                   </li>
                 </ul>
               </div>
