@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RyanCwynar.github.io
 
-## Getting Started
+Personal landing page and website upgrade service.
 
-First, run the development server:
+**Live:** https://ryancwynar.github.io
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## What This Is
+
+A lead generation site for website redesign services. Local businesses with outdated websites can submit their URL and receive a free, fully-working replacement site within 48 hours.
+
+## How It Works
+
+1. Business owner submits their website URL via the form
+2. Site is scraped for content and images
+3. A new Next.js site is generated with modern design
+4. They receive an email with before/after screenshots and a link to their new site
+5. If they like it, they pay $200 and we connect their domain
+
+## Tech Stack
+
+- **Frontend:** Next.js 15 + TypeScript + Tailwind CSS
+- **Hosting:** GitHub Pages (static export)
+- **Backend:** Convex (form submissions, prospect tracking)
+- **Payments:** Stripe ($200 one-time)
+- **Email:** Custom templates with before/after screenshots
+
+## Project Structure
+
+```
+/
+├── app/
+│   ├── page.tsx          # Main landing page with form
+│   ├── layout.tsx        # Root layout
+│   └── globals.css       # Tailwind styles
+├── public/
+│   ├── email-previews/   # Email template previews
+│   └── screenshots/      # Before/after images for emails
+└── next.config.ts        # Static export config
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Related Repos
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Individual client sites are deployed as separate repos:
+- [walton-dental](https://github.com/RyanCwynar/walton-dental)
+- [mockup-moossy-dental](https://github.com/RyanCwynar/mockup-moossy-dental)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Rate Limits
 
-## Learn More
+- 15 submissions per day
+- One submission per domain (no duplicates)
 
-To learn more about Next.js, take a look at the following resources:
+## Contact
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Email: ryan@byldr.co
+- Website: https://byldr.co
