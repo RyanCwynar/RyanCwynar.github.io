@@ -259,52 +259,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Examples */}
-      <section id="examples" className="py-24 px-6 bg-slate-800/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Recent Redesigns
-            </h2>
-            <p className="text-slate-400 text-lg">
-              Some examples of sites I&apos;ve built using this process
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <a href="/walton-dental" className="group bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50 hover:border-blue-500/50 transition">
-              <div className="h-40 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
-                <span className="text-4xl">🦷</span>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-white group-hover:text-blue-400 transition">Walton Family Dentistry</h3>
-                <p className="text-slate-400 text-sm">Dental Practice</p>
-              </div>
-            </a>
-            
-            <a href="/moossy-dental" className="group bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50 hover:border-purple-500/50 transition">
-              <div className="h-40 bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center">
-                <span className="text-4xl">😁</span>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-white group-hover:text-purple-400 transition">Moossy Dental</h3>
-                <p className="text-slate-400 text-sm">Dental Practice</p>
-              </div>
-            </a>
-            
-            <a href="/family-chiropractic-coral-springs" className="group bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50 hover:border-green-500/50 transition">
-              <div className="h-40 bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center">
-                <span className="text-4xl">🩺</span>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-white group-hover:text-green-400 transition">Family Chiropractic Center</h3>
-                <p className="text-slate-400 text-sm">Chiropractic Clinic</p>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* CTA / Form Section */}
       <section id="get-started" className="py-24 px-6">
         <div className="max-w-2xl mx-auto">
