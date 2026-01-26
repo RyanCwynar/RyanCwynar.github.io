@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -50,14 +51,60 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <span className="text-xl font-bold text-white">Ryan Cwynar</span>
-          <div className="flex gap-6 text-sm">
+          {/* Desktop nav */}
+          <div className="hidden md:flex gap-6 text-sm">
             <a href="#about" className="text-slate-400 hover:text-white transition">About</a>
             <a href="#how-it-works" className="text-slate-400 hover:text-white transition">How It Works</a>
             <a href="#examples" className="text-slate-400 hover:text-white transition">Examples</a>
             <a href="#get-started" className="text-slate-400 hover:text-white transition">Get Started</a>
           </div>
+          {/* Hamburger button - mobile */}
+          <button
+            onClick={() => setMenuOpen(true)}
+            className="md:hidden p-2 text-slate-400 hover:text-white transition"
+            aria-label="Open menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu overlay */}
+      {menuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-50 md:hidden"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile drawer */}
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-slate-900 border-l border-slate-700 z-50 transform transition-transform duration-300 ease-in-out md:hidden ${
+          menuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-6">
+          <div className="flex justify-end mb-8">
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="p-2 text-slate-400 hover:text-white transition"
+              aria-label="Close menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="flex flex-col gap-6">
+            <a href="#about" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">About</a>
+            <a href="#how-it-works" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">How It Works</a>
+            <a href="#examples" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Examples</a>
+            <a href="#get-started" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Get Started</a>
+          </div>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-6 py-20 pt-32">
