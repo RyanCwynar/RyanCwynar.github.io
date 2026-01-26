@@ -38,7 +38,7 @@ const examples: Example[] = [
   {
     name: "Infinity Roofing",
     type: "Roofing Contractor",
-    beforeImage: "/screenshots/infinity-after.png", // Using after as placeholder
+    beforeImage: "/screenshots/infinity-before.png",
     afterImage: "/screenshots/infinity-after.png",
     liveUrl: "/infinity-roofing",
   },
