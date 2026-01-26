@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -55,7 +56,7 @@ export default function Home() {
           <div className="hidden md:flex gap-6 text-sm">
             <a href="#about" className="text-slate-400 hover:text-white transition">About</a>
             <a href="#how-it-works" className="text-slate-400 hover:text-white transition">How It Works</a>
-            <a href="#examples" className="text-slate-400 hover:text-white transition">Examples</a>
+            <Link href="/examples" className="text-slate-400 hover:text-white transition">Examples</Link>
             <a href="#get-started" className="text-slate-400 hover:text-white transition">Get Started</a>
           </div>
           {/* Hamburger button - mobile */}
@@ -100,7 +101,7 @@ export default function Home() {
           <div className="flex flex-col gap-6">
             <a href="#about" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">About</a>
             <a href="#how-it-works" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">How It Works</a>
-            <a href="#examples" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Examples</a>
+            <Link href="/examples" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Examples</Link>
             <a href="#get-started" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Get Started</a>
           </div>
         </div>
