@@ -38,12 +38,6 @@ A lead generation site for website redesign services. Local businesses with outd
 └── next.config.ts        # Static export config
 ```
 
-## Related Repos
-
-Individual client sites are deployed as separate repos:
-- [walton-dental](https://github.com/RyanCwynar/walton-dental)
-- [mockup-moossy-dental](https://github.com/RyanCwynar/mockup-moossy-dental)
-
 ## Rate Limits
 
 - 15 submissions per day
