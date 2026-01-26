@@ -69,17 +69,17 @@ export default function Home() {
         <div className="relative max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full text-slate-300 text-sm mb-6">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            Free website redesign — no strings attached
+            Free preview — pay only if you want it
           </div>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             I Build Better Websites<br />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">For Free</span>
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">$200 To Go Live</span>
           </h1>
           
           <p className="text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto">
             If you landed here from a site I built, that&apos;s your website reimagined. 
-            No payment required upfront — I build it first, you decide later.
+            The preview is free — if you like it, $200 gets it connected to your domain.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -87,7 +87,7 @@ export default function Home() {
               href="#get-started"
               className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:from-blue-600 hover:to-purple-600 transition"
             >
-              Get Your Free Redesign →
+              Get Your Free Preview →
             </a>
             <a 
               href="#about"
