@@ -19,28 +19,28 @@ const examples: Example[] = [
     type: "Dental Practice",
     beforeImage: "/screenshots/walton-before.jpg",
     afterImage: "/screenshots/walton-after.jpg",
-    liveUrl: "/walton-dental",
+    liveUrl: "https://ryancwynar.github.io/walton-dental",
   },
   {
     name: "Moossy Dental",
     type: "Dental Practice", 
     beforeImage: "/screenshots/moossy-before.jpg",
     afterImage: "/screenshots/moossy-after.jpg",
-    liveUrl: "/moossy-dental",
+    liveUrl: "https://ryancwynar.github.io/moossy-dental",
   },
   {
     name: "A Splash Pool Service",
     type: "Pool Services",
     beforeImage: "/screenshots/asplash-before.png",
     afterImage: "/screenshots/asplash-after.png",
-    liveUrl: "/asplash-pool",
+    liveUrl: "https://ryancwynar.github.io/asplash-pool-redesign",
   },
   {
     name: "Infinity Roofing",
     type: "Roofing Contractor",
     beforeImage: "/screenshots/infinity-before.png",
     afterImage: "/screenshots/infinity-after.png",
-    liveUrl: "/infinity-roofing",
+    liveUrl: "https://ryancwynar.github.io/infinity-roofing-redesign",
   },
 ];
 
