@@ -1,106 +1,47 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface Example {
-  name: string;
-  type: string;
-  beforeImage: string;
-  afterImage: string;
-  liveUrl?: string;
-  originalUrl?: string;
+  businessName: string;
+  niche: string;
+  generatedSiteUrl: string;
+  currentWebsite: string;
+  location: string;
 }
 
-const examples: Example[] = [
-  {
-    name: "Walton Family Dentistry",
-    type: "Dental Practice",
-    beforeImage: "/screenshots/walton-before.jpg",
-    afterImage: "/screenshots/walton-after.jpg",
-    liveUrl: "https://ryancwynar.github.io/walton-dental",
-  },
-  {
-    name: "Moossy Dental",
-    type: "Dental Practice", 
-    beforeImage: "/screenshots/moossy-before.jpg",
-    afterImage: "/screenshots/moossy-after.jpg",
-    liveUrl: "https://ryancwynar.github.io/moossy-dental",
-  },
-  {
-    name: "A Splash Pool Service",
-    type: "Pool Services",
-    beforeImage: "/screenshots/asplash-before.png",
-    afterImage: "/screenshots/asplash-after.png",
-    liveUrl: "https://ryancwynar.github.io/asplash-pool-redesign",
-  },
-  {
-    name: "Infinity Roofing",
-    type: "Roofing Contractor",
-    beforeImage: "/screenshots/infinity-before.png",
-    afterImage: "/screenshots/infinity-after.png",
-    liveUrl: "https://ryancwynar.github.io/infinity-roofing-redesign",
-  },
-];
-
 function ExampleCard({ example }: { example: Example }) {
-  const [showAfter, setShowAfter] = useState(false);
-
   return (
-    <div className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50">
-      <div className="relative aspect-[16/10] overflow-hidden">
-        <div className="absolute inset-0 flex">
-          {/* Before */}
-          <div 
-            className={`absolute inset-0 transition-opacity duration-500 ${showAfter ? 'opacity-0' : 'opacity-100'}`}
-          >
-            <Image
-              src={example.beforeImage}
-              alt={`${example.name} - Before`}
-              fill
-              className="object-cover object-top"
-            />
-            <div className="absolute top-3 left-3 bg-red-500/90 text-white text-xs font-bold px-2 py-1 rounded">
-              BEFORE
-            </div>
+    <div className="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700/50 hover:border-slate-600 transition">
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <div>
+            <h3 className="text-lg font-semibold text-white">{example.businessName}</h3>
+            <p className="text-slate-400 text-sm capitalize">{example.niche}</p>
           </div>
-          {/* After */}
-          <div 
-            className={`absolute inset-0 transition-opacity duration-500 ${showAfter ? 'opacity-100' : 'opacity-0'}`}
-          >
-            <Image
-              src={example.afterImage}
-              alt={`${example.name} - After`}
-              fill
-              className="object-cover object-top"
-            />
-            <div className="absolute top-3 left-3 bg-green-500/90 text-white text-xs font-bold px-2 py-1 rounded">
-              AFTER
-            </div>
-          </div>
+          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded-full">
+            {example.location}
+          </span>
         </div>
-      </div>
-      
-      <div className="p-5">
-        <h3 className="text-lg font-semibold text-white mb-1">{example.name}</h3>
-        <p className="text-slate-400 text-sm mb-4">{example.type}</p>
         
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowAfter(!showAfter)}
-            className="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-sm py-2 px-4 rounded-lg transition font-medium"
+        <div className="flex gap-3 mt-4">
+          <a
+            href={example.currentWebsite}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 bg-slate-700 hover:bg-slate-600 text-white text-sm py-2 px-4 rounded-lg transition font-medium text-center"
           >
-            {showAfter ? "Show Before" : "Show After"}
-          </button>
-          {example.liveUrl && (
-            <Link
-              href={example.liveUrl}
-              className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white text-sm py-2 px-4 rounded-lg transition font-medium text-center"
-            >
-              View Live
-            </Link>
-          )}
+            View Original
+          </a>
+          <a
+            href={example.generatedSiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white text-sm py-2 px-4 rounded-lg transition font-medium text-center"
+          >
+            View Redesign
+          </a>
         </div>
       </div>
     </div>
@@ -109,6 +50,26 @@ function ExampleCard({ example }: { example: Example }) {
 
 export default function ExamplesPage() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [examples, setExamples] = useState<Example[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchExamples() {
+      try {
+        const res = await fetch("https://convex-actions.byldr.co/examples");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const data = await res.json();
+        setExamples(data);
+      } catch (err) {
+        setError("Failed to load examples");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchExamples();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -175,10 +136,10 @@ export default function ExamplesPage() {
       <section className="pt-32 pb-16 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Before & After
+            Website Redesigns
           </h1>
           <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Real examples of websites I&apos;ve redesigned. Toggle between before and after to see the difference.
+            {loading ? "Loading examples..." : `${examples.length} sites redesigned and counting. Click to compare original vs redesign.`}
           </p>
         </div>
       </section>
@@ -186,11 +147,21 @@ export default function ExamplesPage() {
       {/* Examples Grid */}
       <section className="pb-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {examples.map((example) => (
-              <ExampleCard key={example.name} example={example} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-red-400">{error}</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {examples.map((example) => (
+                <ExampleCard key={example.generatedSiteUrl} example={example} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
