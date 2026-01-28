@@ -1,7 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+
+const WHISPER_WS_URL = "wss://whisper-ws.byldr.co";
+const BLOG_API_URL = "https://convex-actions.byldr.co/blog";
+
+interface BlogArticle {
+  _id: string;
+  slug: string;
+  title: string;
+  excerpt?: string;
+  content: string;
+  tags?: string[];
+  publishedAt?: number;
+}
 
 export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,6 +26,139 @@ export default function Home() {
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  
+  // Voice input state
+  const [voiceRequest, setVoiceRequest] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  
+  // Blog state
+  const [articles, setArticles] = useState<BlogArticle[]>([]);
+  const [loadingArticles, setLoadingArticles] = useState(true);
+
+  // Fetch blog articles on mount
+  useEffect(() => {
+    async function fetchArticles() {
+      try {
+        const res = await fetch(BLOG_API_URL);
+        if (res.ok) {
+          const data = await res.json();
+          setArticles(data.slice(0, 3)); // Show latest 3
+        }
+      } catch (err) {
+        console.error("Failed to fetch articles:", err);
+      } finally {
+        setLoadingArticles(false);
+      }
+    }
+    fetchArticles();
+  }, []);
+
+  const startRecording = async () => {
+    setIsConnecting(true);
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true
+        } 
+      });
+      streamRef.current = stream;
+
+      const ws = new WebSocket(WHISPER_WS_URL);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ type: "config", sampleRate: 16000 }));
+        
+        const mediaRecorder = new MediaRecorder(stream, { 
+          mimeType: 'audio/webm;codecs=opus'
+        });
+        mediaRecorderRef.current = mediaRecorder;
+        
+        mediaRecorder.ondataavailable = async (e) => {
+          if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) {
+            const buffer = await e.data.arrayBuffer();
+            ws.send(buffer);
+          }
+        };
+        
+        mediaRecorder.start(500);
+        setIsConnecting(false);
+        setIsRecording(true);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "partial" || data.type === "final") {
+            setVoiceRequest(data.text);
+          }
+        } catch (e) {
+          console.error("Failed to parse WS message:", e);
+        }
+      };
+
+      ws.onerror = () => {
+        setIsConnecting(false);
+        setIsRecording(false);
+        alert("Failed to connect to voice service.");
+      };
+
+      ws.onclose = () => {
+        cleanup();
+      };
+
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+      setIsConnecting(false);
+      alert("Could not access microphone. Please allow microphone access.");
+    }
+  };
+
+  const cleanup = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setIsRecording(false);
+    setIsConnecting(false);
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setIsRecording(false);
+    
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ type: "end" }));
+      setTimeout(() => {
+        if (wsRef.current) {
+          wsRef.current.close();
+          wsRef.current = null;
+        }
+        setIsConnecting(false);
+      }, 2000);
+    } else {
+      setIsConnecting(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,10 +186,23 @@ export default function Home() {
       } else {
         throw new Error(data.message || "Failed to submit");
       }
-    } catch (err) {
+    } catch {
       setStatus("error");
       setMessage("Something went wrong. Try emailing me directly at ryan@byldr.co");
     }
+  };
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  const estimateReadTime = (content: string) => {
+    const words = content.split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / 200));
   };
 
   return (
@@ -54,8 +213,9 @@ export default function Home() {
           <span className="text-xl font-bold text-white">Ryan Cwynar</span>
           {/* Desktop nav */}
           <div className="hidden md:flex gap-6 text-sm">
+            <a href="#build" className="text-slate-400 hover:text-white transition">Build</a>
             <a href="#about" className="text-slate-400 hover:text-white transition">About</a>
-            <a href="#how-it-works" className="text-slate-400 hover:text-white transition">How It Works</a>
+            <a href="#blog" className="text-slate-400 hover:text-white transition">Blog</a>
             <Link href="/examples" className="text-slate-400 hover:text-white transition">Examples</Link>
             <a href="#get-started" className="text-slate-400 hover:text-white transition">Get Started</a>
           </div>
@@ -99,8 +259,9 @@ export default function Home() {
             </button>
           </div>
           <div className="flex flex-col gap-6">
+            <a href="#build" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Build</a>
             <a href="#about" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">About</a>
-            <a href="#how-it-works" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">How It Works</a>
+            <a href="#blog" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Blog</a>
             <Link href="/examples" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Examples</Link>
             <a href="#get-started" onClick={() => setMenuOpen(false)} className="text-lg text-slate-300 hover:text-white transition">Get Started</a>
           </div>
@@ -138,10 +299,103 @@ export default function Home() {
               Get Your Free Preview →
             </a>
             <a 
-              href="#about"
+              href="#build"
               className="bg-slate-700/50 text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-slate-700 transition border border-slate-600"
             >
-              Who Is This Guy?
+              Tell Me What You Need
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Voice Input Section - "What Do You Want To Build?" */}
+      <section id="build" className="py-24 px-6 bg-slate-800/30">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            What Do You Want To <span className="text-emerald-400">Build</span>?
+          </h2>
+          <p className="text-slate-400 text-lg mb-8 max-w-xl mx-auto">
+            Tell me what you need — a website, an app, automation — and I&apos;ll make it happen.
+          </p>
+
+          <div className="bg-slate-800/70 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+            {/* Voice Recording Button */}
+            <div className="flex justify-center mb-6">
+              <button
+                type="button"
+                onClick={isRecording ? stopRecording : startRecording}
+                disabled={isConnecting}
+                className={`flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-lg transition-all ${
+                  isRecording
+                    ? "bg-red-500 hover:bg-red-400 text-white animate-pulse"
+                    : isConnecting
+                    ? "bg-slate-600 text-slate-300 cursor-wait"
+                    : "bg-emerald-500 hover:bg-emerald-400 text-white hover:scale-105"
+                }`}
+              >
+                {isConnecting ? (
+                  <>
+                    <svg className="w-6 h-6 animate-spin" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <span>Connecting...</span>
+                  </>
+                ) : isRecording ? (
+                  <>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <rect x="6" y="6" width="12" height="12" rx="2" />
+                    </svg>
+                    <span>Stop Recording</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                    <span>Speak Your Request</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {isRecording && (
+              <p className="text-red-400 text-sm mb-4 flex items-center justify-center gap-2">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                Listening...
+              </p>
+            )}
+
+            <p className="text-slate-500 text-sm mb-4">or type below</p>
+
+            <textarea
+              value={voiceRequest}
+              onChange={(e) => !isRecording && setVoiceRequest(e.target.value)}
+              placeholder="e.g., I need a modern website for my plumbing business, an app to manage appointments, automation for follow-up emails..."
+              className="w-full h-32 px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
+              readOnly={isRecording}
+            />
+
+            <a
+              href={`mailto:ryan@byldr.co?subject=Build Request&body=${encodeURIComponent(voiceRequest || "I want to build...")}`}
+              className="inline-block mt-6 px-8 py-4 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white rounded-xl font-semibold text-lg transition-all hover:scale-[1.02]"
+            >
+              Send Request →
+            </a>
+          </div>
+
+          {/* Call CTA */}
+          <div className="mt-8">
+            <p className="text-slate-400 mb-3">Or call anytime — Alex is available 24/7</p>
+            <a 
+              href="tel:+18777574169"
+              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-semibold text-lg transition"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+              </svg>
+              (877) 757-4169
             </a>
           </div>
         </div>
@@ -152,11 +406,9 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8 items-center">
             <div className="md:col-span-1 text-center">
-              <img 
-                src="/profile.png" 
-                alt="Ryan Cwynar" 
-                className="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-2 border-blue-500/50"
-              />
+              <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full mx-auto mb-4 flex items-center justify-center text-5xl font-bold text-white">
+                R
+              </div>
               <h3 className="text-xl font-bold text-white">Ryan Cwynar</h3>
               <p className="text-slate-400">Software Developer</p>
               <div className="flex gap-3 justify-center mt-4">
@@ -169,8 +421,8 @@ export default function Home() {
                 <a href="mailto:ryan@byldr.co" className="text-slate-400 hover:text-white transition">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                 </a>
-                <a href="tel:+18777574169" className="text-slate-400 hover:text-white transition">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                <a href="https://linkedin.com/in/rcwynar" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-white transition">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                 </a>
               </div>
             </div>
@@ -200,8 +452,94 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Blog Section */}
+      <section id="blog" className="py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Latest from the <span className="text-emerald-400">Blog</span>
+            </h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Notes on building AI-powered tools, automation, and shipping fast.
+            </p>
+          </div>
+
+          {loadingArticles ? (
+            <div className="grid md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/30 animate-pulse">
+                  <div className="h-4 bg-slate-700 rounded w-1/3 mb-4"></div>
+                  <div className="h-6 bg-slate-700 rounded w-full mb-3"></div>
+                  <div className="h-4 bg-slate-700 rounded w-2/3"></div>
+                </div>
+              ))}
+            </div>
+          ) : articles.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-6">
+              {articles.map((article) => (
+                <a
+                  key={article._id}
+                  href={`https://byldr.co/blog/${article.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block group"
+                >
+                  <article className="h-full bg-slate-800/50 hover:bg-slate-800/80 rounded-2xl p-6 border border-slate-700/30 hover:border-emerald-500/30 transition-all duration-200">
+                    {article.tags && article.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {article.tags.slice(0, 2).map((tag) => (
+                          <span 
+                            key={tag} 
+                            className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 rounded-full text-xs"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <h3 className="text-lg font-semibold mb-3 group-hover:text-emerald-400 transition-colors leading-snug text-white">
+                      {article.title}
+                    </h3>
+                    {article.excerpt && (
+                      <p className="text-slate-400 text-sm mb-4 line-clamp-2">
+                        {article.excerpt}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                      {article.publishedAt && (
+                        <span>{formatDate(article.publishedAt)}</span>
+                      )}
+                      <span className="text-slate-700">•</span>
+                      <span>{estimateReadTime(article.content)} min read</span>
+                    </div>
+                  </article>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-slate-800/30 rounded-2xl border border-slate-700/30">
+              <p className="text-slate-400">Check back soon for new articles!</p>
+            </div>
+          )}
+
+          <div className="text-center mt-8">
+            <a
+              href="https://byldr.co/blog"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium transition"
+            >
+              View all articles
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 px-6">
+      <section id="how-it-works" className="py-24 px-6 bg-slate-800/30">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
