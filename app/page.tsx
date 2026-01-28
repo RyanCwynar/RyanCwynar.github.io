@@ -122,12 +122,12 @@ export default function Home() {
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             I Build Better Websites<br />
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">$200 To Go Live</span>
+            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">$25 To Go Live</span>
           </h1>
           
           <p className="text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl mx-auto">
             If you landed here from a site I built, that&apos;s your website reimagined. 
-            The preview is free — if you like it, $200 gets it connected to your domain.
+            The preview is free — if you like it, $25 gets it connected to your domain.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -249,13 +249,13 @@ export default function Home() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">4. You Decide</h3>
               <p className="text-slate-400 text-sm">
-                Like it? $200 and it&apos;s yours. Don&apos;t? No worries at all.
+                Like it? $25 and it&apos;s yours. Don&apos;t? No worries at all.
               </p>
             </div>
           </div>
 
           <div className="mt-12 bg-slate-800/30 rounded-2xl p-6 border border-slate-700/50">
-            <h3 className="text-lg font-semibold text-white mb-2">🤔 Why $200?</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">🤔 Why $25?</h3>
             <p className="text-slate-400">
               It covers my time to customize the site to your needs, connect your domain, and handle any 
               revisions. No monthly fees, no hosting costs, no hidden charges. One payment, you own the code.
@@ -401,7 +401,7 @@ export default function Home() {
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700/50">
               <h3 className="text-lg font-semibold text-white mb-2">Is this actually free?</h3>
               <p className="text-slate-400">
-                Yes. I build the site and show it to you — no payment required. You only pay $200 if you 
+                Yes. I build the site and show it to you — no payment required. You only pay $25 if you 
                 want me to connect it to your domain and make it live. If not, no charge.
               </p>
             </div>
@@ -418,7 +418,7 @@ export default function Home() {
             <div className="bg-slate-800 rounded-xl p-6 border border-slate-700/50">
               <h3 className="text-lg font-semibold text-white mb-2">Can I request changes?</h3>
               <p className="text-slate-400">
-                Absolutely. The $200 includes revisions — different colors, layout tweaks, content changes. 
+                Absolutely. The $25 includes revisions — different colors, layout tweaks, content changes. 
                 I want you to love the final result.
               </p>
             </div>
